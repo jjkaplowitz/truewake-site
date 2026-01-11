@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TrueWake — Maritime Evidence OS</title>
+  <meta name="description"
+    content="Independent assurance for maritime operations. Cryptographically secure operational evidence. Insurer-grade clarity for autonomy." />
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#171a20;
+      --muted:#5c5e62;
+      --line:rgba(0,0,0,.10);
+
+      --btn:#171a20;
+      --btnText:#fff;
+      --btnAlt:rgba(244,244,244,.92);
+      --btnAltText:#171a20;
+
+      --btnBorder: rgba(0,0,0,.18);
+      --btnShadow: 0 10px 24px rgba(0,0,0,.12);
+
+      --radius:999px;
+      --max:1120px;
+      --navH:56px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      letter-spacing:.1px;
+    }
+
+    a{color:inherit;text-decoration:none}
+
+    .wrap{
+      max-width:var(--max);
+      margin:0 auto;
+      padding:0 24px;
+    }
+
+    /* NAV */
+    .nav{
+      position:fixed;
+      top:0;left:0;right:0;
+      z-index:50;
+      background:rgba(255,255,255,.80);
+      backdrop-filter:blur(10px);
+    }
+
+    .nav-inner{
+      height:var(--navH);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:0 18px;
+      border-bottom:1px solid rgba(0,0,0,.05);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      height:100%;
+      flex:0 0 auto;
+    }
+
+    .brand img{
+      height:84px;
+      width:auto;
+      display:block;
+    }
+
+    .nav-links{
+      display:flex;
+      gap:6px;
+      align-items:center;
+      justify-content:center;
+      flex:1;
+    }
+
+    .nav-links a{
+      font-size:12px;
+      letter-spacing:.2px;
+      padding:8px 12px;
+      border-radius:10px;
+      color:var(--text);
+      opacity:.92;
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .nav-links a:hover{background:rgba(0,0,0,.06)}
+
+    .nav-right{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+
+    .nav-pill{
+      font-size:12px;
+      padding:8px 12px;
+      border-radius:10px;
+      background:rgba(0,0,0,.04);
+    }
+
+    /* PANELS */
+    main{
+      scroll-snap-type:y mandatory;
+      height:100vh;
+      overflow:auto;
+    }
+
+    .panel{
+      min-height:100vh;
+      scroll-snap-align:start;
+      position:relative;
+
+      /* FIX: real vertical layout so buttons never overlap content */
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;
+
+      padding-top:var(--navH);
+      border-bottom:1px solid var(--line);
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(1200px 700px at 50% 20%, rgba(0,0,0,.06), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,0));
+      pointer-events:none;
+    }
+
+    .panel .content{
+      position:relative;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+
+      /* FIX: content uses available space; actions sit below */
+      flex:1 1 auto;
+
+      padding:54px 0 18px;
+    }
+
+    /* HERO (Tesla-like) */
+    .panel.hero{
+      background-color:#0b0f1a;
+      background-image: var(--heroBg, none);
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+    }
+
+    .panel.hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(900px 600px at 50% 28%, rgba(0,0,0,.55), transparent 68%),
+        linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,.25) 46%, rgba(0,0,0,.22) 100%);
+      pointer-events:none;
+    }
+
+    .panel.hero .content{
+      min-height:calc(100vh - var(--navH));
+      padding-top:64px;
+      padding-bottom:24px; /* no giant reserve needed now */
+      justify-content:flex-start;
+    }
+
+    .title{
+      font-weight:700;
+      font-size:clamp(34px, 4.8vw, 56px);
+      letter-spacing:-.6px;
+      line-height:1.05;
+    }
+
+    .subtitle{
+      margin-top:10px;
+      font-size:15px;
+      line-height:1.55;
+      color:var(--muted);
+      max-width:74ch;
+    }
+
+    .micro{
+      margin-top:10px;
+      font-size:12.5px;
+      color:var(--muted);
+      max-width:78ch;
+    }
+
+    .panel.hero .title{
+      color:#fff;
+      text-shadow:0 2px 18px rgba(0,0,0,.35);
+      max-width:22ch;
+    }
+
+    /* FIX: hero-foot is in-flow (not absolute) so it can't collide with buttons */
+    .hero-foot{
+      position:relative;
+      max-width:min(760px, 92vw);
+      padding:0 18px;
+      margin-top:14px;
+    }
+
+    .panel.hero .hero-foot .subtitle,
+    .panel.hero .hero-foot .micro{
+      color:rgba(255,255,255,.86);
+      text-shadow:0 2px 14px rgba(0,0,0,.30);
+    }
+
+    /* CTA buttons bar: sticky (no overlap) */
+    .actions{
+      position:sticky;
+      bottom:14px;
+
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+
+      padding:0 20px 18px;
+      z-index:5;
+
+      background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.78) 55%, rgba(255,255,255,.90) 100%);
+      backdrop-filter:blur(10px);
+    }
+
+    /* HERO: darker sticky bar so buttons are readable */
+    .panel.hero .actions{
+      background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.28) 55%, rgba(0,0,0,.42) 100%);
+    }
+
+    /* Buttons */
+    .btn, a.btn, button.btn{
+      -webkit-tap-highlight-color: transparent;
+      appearance:none;
+
+      border:1px solid var(--btnBorder);
+      border-radius:var(--radius);
+
+      background:var(--btn);
+      color:var(--btnText);
+
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+
+      min-height:50px;
+      padding:0 22px;
+
+      font-weight:650;
+      font-size:clamp(16px, 1.1vw, 18px);
+      line-height:1;
+      letter-spacing:.02em;
+
+      box-shadow:var(--btnShadow);
+      cursor:pointer;
+      user-select:none;
+      text-decoration:none;
+
+      transition:transform .12s ease, box-shadow .12s ease, filter .12s ease, background .12s ease;
+    }
+
+    .btn.primary{background:var(--btn); color:var(--btnText)}
+    .btn.secondary{
+      background:var(--btnAlt);
+      color:var(--btnAltText);
+      border-color:rgba(0,0,0,.12);
+      box-shadow:0 10px 20px rgba(0,0,0,.08);
+    }
+
+    .btn:hover{
+      filter:brightness(1.06);
+      transform:translateY(-1px);
+      box-shadow:0 14px 34px rgba(0,0,0,.16);
+    }
+
+    .btn:active{
+      transform:translateY(0px);
+      box-shadow:var(--btnShadow);
+    }
+
+    .btn:focus-visible{
+      outline:3px solid rgba(23,26,32,.22);
+      outline-offset:3px;
+    }
+
+    /* FIX: inside actions, allow two-up on desktop, wrap cleanly */
+    .actions .btn{
+      width:auto;
+      max-width:360px;
+      flex:1 1 240px;
+    }
+
+    /* Media block (optional images) */
+    .media{
+      width:100%;
+      max-width:var(--max);
+      margin-top:18px;
+      padding:0 24px;
+    }
+
+    .media-frame{
+      width:100%;
+      border-radius:18px;
+      border:1px solid rgba(0,0,0,.08);
+      background:rgba(0,0,0,.03);
+      overflow:hidden;
+      position:relative;
+      min-height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .media-img{
+      display:none;
+      width:100%;
+      height:auto;
+      object-fit:cover;
+    }
+
+    .media.has-img .media-img{display:block}
+    .media.has-img .media-placeholder{display:none}
+
+    .media-placeholder{
+      padding:22px;
+      text-align:center;
+      color:rgba(23,26,32,.65);
+      font-size:12.5px;
+      line-height:1.45;
+      max-width:70ch;
+    }
+
+    .media-placeholder .hint{
+      display:block;
+      margin-top:8px;
+      font-size:12px;
+      color:rgba(23,26,32,.55);
+    }
+
+    /* Cards */
+    .grid{
+      width:100%;
+      max-width:var(--max);
+      margin-top:22px;
+      display:grid;
+      grid-template-columns:repeat(12,1fr);
+      gap:14px;
+      padding:0 24px;
+    }
+
+    .tile{
+      grid-column:span 4;
+      border-radius:16px;
+      background:rgba(0,0,0,.03);
+      border:1px solid rgba(0,0,0,.06);
+      padding:16px;
+      text-align:left;
+    }
+
+    .tile h3{
+      margin:0 0 8px;
+      font-size:12px;
+      letter-spacing:.7px;
+      text-transform:uppercase;
+      color:rgba(23,26,32,.9);
+    }
+
+    .tile p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    .kpi{
+      font-weight:750;
+      font-size:22px;
+      letter-spacing:-.2px;
+      color:var(--text);
+      margin:4px 0 6px;
+    }
+
+    .sectionTitle{
+      font-weight:700;
+      font-size:clamp(28px, 3.6vw, 44px);
+      letter-spacing:-.5px;
+      line-height:1.1;
+    }
+
+    /* Team avatars */
+    .avatar{margin-bottom:12px}
+
+    .avatar-frame{
+      width:160px;
+      height:160px;
+      border-radius:50%;
+      border:1px solid rgba(0,0,0,.10);
+      background:rgba(0,0,0,.04);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto;
+    }
+
+    .avatar-img{
+      display:none;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .avatar.has-img .avatar-img{display:block}
+    .avatar.has-img .avatar-placeholder{display:none}
+
+    .avatar-placeholder{
+      padding:14px;
+      text-align:center;
+      color:rgba(23,26,32,.62);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    /* responsive */
+    @media (max-width:980px){
+      .nav-links{display:none}
+      .tile{grid-column:span 12}
+
+      /* FIX: mobile should scroll, not snap */
+      main{scroll-snap-type:none;}
+
+      /* tighter vertical rhythm */
+      .panel .content{padding:34px 0 12px;}
+
+      /* CTA bar stacks; never overlaps */
+      .actions{
+        flex-direction:column;
+        align-items:center;
+        bottom:10px;
+        padding:0 14px 14px;
+      }
+
+      .actions .btn{
+        width:min(520px,92vw);
+        max-width:92vw;
+        flex:0 0 auto;
+      }
+
+      .media{padding:0 14px;}
+      .media-frame{min-height:160px;}
+
+      .panel.hero{background-position:50% 70%;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#hero" aria-label="TrueWake home">
+        <img src="assets/logo.png" alt="TrueWake logo" />
+      </a>
+
+      <div class="nav-links">
+        <a href="#hero">Overview</a>
+        <a href="#problem">Problem</a>
+        <a href="#solution">Solution</a>
+        <a href="#platform">Platform</a>
+        <a href="#market">Market</a>
+        <a href="#team">Team</a>
+      </div>
+
+      <div class="nav-right">
+        <a class="nav-pill" href="#contact">Demo</a>
+        <!-- <a class="nav-pill" href="#raise">Seed</a> -->
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- HERO -->
+    <section class="panel hero" id="hero" style="--heroBg:url('assets/ship.jpg')">
+      <div class="content wrap">
+        <div class="title">AI-Powered Investigation & Reconstruction for Vessels & Offshore Platforms</div>
+        <div class="hero-foot">
+          <div class="subtitle">
+            True Wake fuses all operational sensors into a single legal- and insurer-ready timeline — cutting investigation time by 50–70%.
+          </div>
+          <!-- <div class="micro">
+            Built for collision/allision disputes, delayed settlements, and commercial autonomy in crowded, regulated waters.
+          </div> -->
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#solution').scrollIntoView({behavior:'smooth'})">Explore Platform</button>
+        <button class="btn secondary"
+          onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">Request Demo</button>
+      </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section class="panel" id="problem">
+      <div class="content wrap">
+        <div class="sectionTitle">The Problem</div>
+        <div class="subtitle">
+          Investigations are slow, fragmented, and expensive
+        </div>
+
+        <!-- SLIDE IMAGE AREA (optional) -->
+        <div class="media" data-img="assets/problem.jpg" data-alt="Problem slide image">
+          <div class="media-frame">
+            <img class="media-img" alt="" loading="lazy" />
+            <div class="media-placeholder">
+              Problem slide image placeholder (optional)
+              <span class="hint">Add an image at <strong>assets/problem.jpg</strong> or edit <code>data-img</code>. Works fine without an image.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="tile">
+            <h3>High costs</h3>
+            <p>$1M–$50M per incident in legal + forensic fees</p>
+          </div>
+          <div class="tile">
+            <h3>Poor evidence</h3>
+            <p>Evidence scattered across AIS, radar, SCADA, cameras, and logs</p>
+          </div>
+          <div class="tile">
+            <h3>Autonomy</h3>
+            <p>Reduced crews & autonomy → fewer witnesses, longer resolution</p>
+          </div>
+          <div class="tile">
+            <h3>Little data</h3>
+            <p>Lack of statistical evidence prevents insurers from underwriting MASS</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#solution').scrollIntoView({behavior:'smooth'})">See the Solution</button>
+        <button class="btn secondary"
+          onclick="document.querySelector('#platform').scrollIntoView({behavior:'smooth'})">How It Works</button>
+      </div>
+    </section>
+
+    <!-- SOLUTION -->
+    <section class="panel" id="solution">
+      <div class="content wrap">
+        <div class="sectionTitle">AI-Powered Solution</div>
+        <div class="subtitle">
+          True Wake: The AI Investigation & Reconstruction Engine
+        </div>
+
+        <!-- SLIDE IMAGE AREA (optional) -->
+        <div class="media" data-img="assets/solution.jpg" data-alt="Solution slide image">
+          <div class="media-frame">
+            <img class="media-img" alt="" loading="lazy" />
+            <div class="media-placeholder">
+              Solution slide image placeholder (optional)
+              <span class="hint">Add an image at <strong>assets/solution.jpg</strong> or edit <code>data-img</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="tile"><h3>1. Ingest</h3><p>Multi-sensor data (AIS, radar, cameras, SCADA, logs)</p></div>
+          <div class="tile"><h3>2. Analyze</h3><p>AI synchronizes timeline & classifies events (COLREG/HSE)</p></div>
+          <div class="tile"><h3>3. Reconstruct</h3><p>Auto-generate legal-grade incident packages</p></div>
+          <div class="tile"><h3>4. Report</h3><p>Share insights with operators, insurers, regulators</p></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#platform').scrollIntoView({behavior:'smooth'})">Platform</button>
+        <button class="btn secondary"
+          onclick="document.querySelector('#market').scrollIntoView({behavior:'smooth'})">Market & Model</button>
+      </div>
+    </section>
+
+    <!-- PLATFORM -->
+    <section class="panel" id="platform">
+      <div class="content wrap">
+        <div class="sectionTitle">Assurance Platform</div>
+        <div class="subtitle">
+          Multi-sensor fusion + immutable evidence + rules-based reasoning + APIs for insurers and investigators.
+        </div>
+
+        <!-- SLIDE IMAGE AREA (optional) -->
+        <div class="media" data-img="assets/platform.jpg" data-alt="Platform slide image">
+          <div class="media-frame">
+            <img class="media-img" alt="" loading="lazy" />
+            <div class="media-placeholder">
+              Platform slide image placeholder (optional)
+              <span class="hint">Add an image at <strong>assets/platform.jpg</strong> or edit <code>data-img</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="tile"><h3>Ingest</h3><p>Navigation, control, sensor, and autonomy streams into a unified operational model.</p></div>
+          <div class="tile"><h3>Reason</h3><p>Maritime rules + behavior classification; autonomy auditing against legal standards.</p></div>
+          <div class="tile"><h3>Prove</h3><p>Immutable evidence ledger plus verified reconstructions and risk metrics.</p></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#market').scrollIntoView({behavior:'smooth'})">Market</button>
+        <button class="btn secondary"
+          onclick="document.querySelector('#team').scrollIntoView({behavior:'smooth'})">Team</button>
+      </div>
+    </section>
+
+    <!-- MARKET -->
+    <section class="panel" id="market">
+      <div class="content wrap">
+        <div class="sectionTitle">Market & Model</div>
+        <div class="subtitle">
+          A Multi-Billion-Dollar Problem Ready for AI
+        </div>
+
+        <!-- SLIDE IMAGE AREA (optional) -->
+        <div class="media" data-img="assets/market.jpg" data-alt="Market slide image">
+          <div class="media-frame">
+            <img class="media-img" alt="" loading="lazy" />
+            <div class="media-placeholder">
+              Market slide image placeholder (optional)
+              <span class="hint">Add an image at <strong>assets/market.jpg</strong> or edit <code>data-img</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="tile">
+            <h3>TAM</h3>
+            <div class="kpi">$4.1B–$7.0B</div>
+            <p>Global insured commercial fleet (including autonomous / semi-autonomous vessels).</p>
+          </div>
+          <div class="tile">
+            <h3>SAM</h3>
+            <div class="kpi">$1.42B</div>
+            <p>5–7 year horizon focused on high-risk fleets with strong insurance touch.</p>
+          </div>
+          <div class="tile">
+            <h3>SOM</h3>
+            <div class="kpi">$70M–$140M</div>
+            <p>3–5 year wedge via insurer standardization → fleet rollout.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#team').scrollIntoView({behavior:'smooth'})">Team</button>
+        <button class="btn secondary"
+          onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">Demo</button>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+    <section class="panel" id="team">
+      <div class="content wrap">
+        <div class="sectionTitle">Team</div>
+        <div class="subtitle">
+          Maritime investigations, sensor fusion/autonomy, and bridge/network systems—built by operators.
+        </div>
+
+        <div class="grid">
+          <div class="tile">
+            <div class="avatar" data-img="assets/ceo.jpeg" data-alt="Jordan Foley headshot">
+              <div class="avatar-frame">
+                <img class="avatar-img" alt="" loading="lazy" />
+                <div class="avatar-placeholder">
+                  CEO photo (optional)<br/>
+                  <span class="hint" style="display:block;margin-top:6px;color:rgba(23,26,32,.52)">assets/jordan-foley.jpg</span>
+                </div>
+              </div>
+            </div>
+
+            <h3>CEO</h3>
+            <p><strong>Jordan Foley</strong><br/>US Naval Academy, MIT, Georgetown Law<br/>Maritime investigations, naval operations, non-profit founder</p>
+          </div>
+
+          <div class="tile">
+            <div class="avatar" data-img="assets/cto.jpeg" data-alt="Ari Brown headshot">
+              <div class="avatar-frame">
+                <img class="avatar-img" alt="" loading="lazy" />
+                <div class="avatar-placeholder">
+                  CTO photo (optional)<br/>
+                  <span class="hint" style="display:block;margin-top:6px;color:rgba(23,26,32,.52)">assets/ari-brown.jpg</span>
+                </div>
+              </div>
+            </div>
+
+            <h3>CTO</h3>
+            <p><strong>Ari Brown</strong><br/>U Michigan<br/>Sensor fusion, autonomy, submarine veteran, naval engineering</p>
+          </div>
+
+          <div class="tile">
+            <div class="avatar" data-img="assets/coo.png" data-alt="Jesse Neumann headshot">
+              <div class="avatar-frame">
+                <img class="avatar-img" alt="" loading="lazy" />
+                <div class="avatar-placeholder">
+                  COO photo (optional)<br/>
+                  <span class="hint" style="display:block;margin-top:6px;color:rgba(23,26,32,.52)">assets/jesse-neumann.jpg</span>
+                </div>
+              </div>
+            </div>
+
+            <h3>COO</h3>
+            <p><strong>Jesse Neumann</strong><br/>Mass College of Art, Suffolk Law<br/>Bridge systems, vessel networks, naval surface warfare operations</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#contact').scrollIntoView({behavior:'smooth'})">Request Demo</button>
+        <button class="btn secondary"
+          onclick="document.querySelector('#hero').scrollIntoView({behavior:'smooth'})">Back to Top</button>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="panel" id="contact">
+      <div class="content wrap">
+        <div class="sectionTitle">Request a Demo</div>
+        <div class="subtitle"></div>
+
+        <div class="media" data-img="assets/demo.jpg" data-alt="Contact slide image">
+          <div class="media-frame">
+            <img class="media-img" alt="" loading="lazy" />
+            <div class="media-placeholder">
+              Contact slide image placeholder (optional)
+              <span class="hint">Add an image at <strong>assets/contact.jpg</strong> or edit <code>data-img</code>.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="tile" style="grid-column: span 12;">
+            <h3>Contact</h3>
+            <p style="margin-bottom:12px;color:var(--muted)">Email</p>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+              <a class="btn primary" href="mailto:JJ@truewake.io">Email</a>
+            </div>
+            <div style="margin-top:14px; font-size:12px; color:var(--muted);">
+              © <span id="year"></span> TrueWake
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary"
+          onclick="document.querySelector('#hero').scrollIntoView({behavior:'smooth'})">Explore Again</button>
+        <button class="btn secondary"
+          onclick="window.scrollTo({top:0, behavior:'smooth'})">Top</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Smooth internal nav
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        const id = a.getAttribute('href');
+        const el = document.querySelector(id);
+        if(!el) return;
+        e.preventDefault();
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+    });
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Optional images: render cleanly with OR without the file present (no broken image icons)
+    function wireOptionalImage(containerSelector, imgSelector, loadedClass){
+      document.querySelectorAll(containerSelector).forEach(container=>{
+        const src = container.getAttribute("data-img");
+        const alt = container.getAttribute("data-alt") || "";
+        const img = container.querySelector(imgSelector);
+        if(!img) return;
+
+        if(!src){
+          container.classList.remove(loadedClass);
+          return;
+        }
+
+        img.alt = alt;
+
+        img.addEventListener("load", ()=>{
+          container.classList.add(loadedClass);
+        }, { once:true });
+
+        img.addEventListener("error", ()=>{
+          container.classList.remove(loadedClass);
+          img.removeAttribute("src");
+        }, { once:true });
+
+        img.src = src;
+      });
+    }
+
+    wireOptionalImage(".media", ".media-img", "has-img");
+    wireOptionalImage(".avatar", ".avatar-img", "has-img");
+  </script>
+</body>
+</html>
