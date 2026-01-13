@@ -26,6 +26,9 @@
 			--radius: 999px;
 			--max: 1120px;
 			--navH: 56px;
+
+			/* FIX: reserve space for the sticky action bar so it never covers content */
+			--actionsReserve: 118px;
 		}
 
 		* {
@@ -169,7 +172,8 @@
 			/* FIX: content uses available space; actions sit below */
 			flex: 1 1 auto;
 
-			padding: 54px 0 18px;
+			/* FIX: reserve room so sticky actions never cover bottom CTAs (like Email) */
+			padding: 54px 0 calc(18px + var(--actionsReserve));
 		}
 
 		/* HERO (Tesla-like) */
@@ -194,8 +198,8 @@
 		.panel.hero .content {
 			min-height: calc(100vh - var(--navH));
 			padding-top: 64px;
-			padding-bottom: 24px;
-			/* no giant reserve needed now */
+			/* keep the reserve so hero actions don't cover anything either */
+			padding-bottom: calc(24px + var(--actionsReserve));
 			justify-content: flex-start;
 		}
 
@@ -241,7 +245,7 @@
 			text-shadow: 0 2px 14px rgba(0, 0, 0, .30);
 		}
 
-		/* CTA buttons bar: sticky (no overlap) */
+		/* CTA buttons bar: sticky (no overlap because we reserved space above) */
 		.actions {
 			position: sticky;
 			bottom: 14px;
@@ -328,9 +332,7 @@
 
 		.img-circle {
 			width: 160px;
-			/* control size here */
 			height: 160px;
-			/* must match width */
 			object-fit: cover;
 			border-radius: 50%;
 			display: block;
@@ -338,7 +340,6 @@
 			background: #f4f4f4;
 			box-shadow: 0 10px 24px rgba(0, 0, 0, .14);
 		}
-
 
 		/* FIX: inside actions, allow two-up on desktop, wrap cleanly */
 		.actions .btn {
@@ -438,13 +439,10 @@
 			display: block;
 			width: 100%;
 			max-width: 1200px;
-			/* controls size */
 			margin: 32px auto;
-			/* centers it */
 			border-radius: 16px;
 			box-shadow: 0 12px 28px rgba(0, 0, 0, .12);
 		}
-
 
 		.kpi {
 			font-weight: 750;
@@ -519,7 +517,7 @@
 
 			/* tighter vertical rhythm */
 			.panel .content {
-				padding: 34px 0 12px;
+				padding: 34px 0 calc(12px + var(--actionsReserve));
 			}
 
 			/* CTA bar stacks; never overlaps */
@@ -584,9 +582,6 @@
 						True Wake fuses all operational sensors into a single legal- and insurer-ready timeline —
 						cutting investigation time by 50–70%.
 					</div>
-					<!-- <div class="micro">
-            Built for collision/allision disputes, delayed settlements, and commercial autonomy in crowded, regulated waters.
-          </div> -->
 				</div>
 			</div>
 
@@ -608,20 +603,7 @@
 					Investigations are slow, fragmented, and expensive
 				</div>
 
-				<!-- SLIDE IMAGE AREA (optional) -->
-				<!-- <div class="media" data-img="assets/problem.jpg" data-alt="Problem slide image">
-          <div class="media-frame"> -->
-
 				<img src="assets/problem.jpg" alt="Problem illustration" class="img-small" />
-
-
-				<!-- <img class="media-img" alt="" loading="lazy" /> -->
-				<!-- <div class="media-placeholder"> -->
-				<!-- Problem slide image placeholder (optional) -->
-				<!-- <span class="hint">Add an image at <strong>assets/problem.jpg</strong> or edit <code>data-img</code>. Works fine without an image.</span> -->
-				<!-- </div> -->
-				<!-- </div>
-        </div> -->
 
 				<div class="grid">
 					<div class="tile">
@@ -660,18 +642,6 @@
 				<div class="subtitle">
 					True Wake: The AI Investigation & Reconstruction Engine
 				</div>
-
-				<!-- SLIDE IMAGE AREA (optional) -->
-				<!-- <div class="media" data-img="assets/solution.jpg" data-alt="Solution slide image">
-					<div class="media-frame">
-						<img class="media-img" alt="" loading="lazy" />
-						<div class="media-placeholder">
-							Solution slide image placeholder (optional)
-							<span class="hint">Add an image at <strong>assets/solution.jpg</strong> or edit
-								<code>data-img</code>.</span>
-						</div>
-					</div>
-				</div> -->
 
 				<img src="assets/solution.jpg" alt="Problem illustration" class="img-small" />
 
@@ -713,18 +683,6 @@
 					investigators.
 				</div>
 
-				<!-- SLIDE IMAGE AREA (optional) -->
-				<!-- <div class="media" data-img="assets/platform.jpg" data-alt="Platform slide image">
-					<div class="media-frame">
-						<img class="media-img" alt="" loading="lazy" />
-						<div class="media-placeholder">
-							Platform slide image placeholder (optional)
-							<span class="hint">Add an image at <strong>assets/platform.jpg</strong> or edit
-								<code>data-img</code>.</span>
-						</div>
-					</div>
-				</div> -->
-
 				<img src="assets/platform.jpg" alt="Problem illustration" class="img-small" />
 
 				<div class="grid">
@@ -758,18 +716,6 @@
 				<div class="subtitle">
 					A Multi-Billion-Dollar Problem Ready for AI
 				</div>
-
-				<!-- SLIDE IMAGE AREA (optional) -->
-				<!-- <div class="media" data-img="assets/market.jpg" data-alt="Market slide image">
-					<div class="media-frame">
-						<img class="media-img" alt="" loading="lazy" />
-						<div class="media-placeholder">
-							Market slide image placeholder (optional)
-							<span class="hint">Add an image at <strong>assets/market.jpg</strong> or edit
-								<code>data-img</code>.</span>
-						</div>
-					</div>
-				</div> -->
 
 				<img src="assets/market.jpg" alt="Problem illustration" class="img-small" />
 
@@ -810,58 +756,21 @@
 
 				<div class="grid">
 					<div class="tile">
-						<!-- <div class="avatar" data-img="assets/ceo.jpeg" data-alt="Jordan Foley headshot">
-							<div class="avatar-frame">
-								<img class="avatar-img" alt="" loading="lazy" />
-								<div class="avatar-placeholder">
-									CEO photo (optional)<br />
-									<span class="hint"
-										style="display:block;margin-top:6px;color:rgba(23,26,32,.52)">assets/jordan-foley.jpg</span>
-								</div>
-							</div>
-						</div> -->
-
 						<img src="assets/ceo.jpeg" alt="Founding team member" class="img-circle" />
-
-
 						<h3>CEO</h3>
 						<p><strong>Jordan Foley</strong><br />US Naval Academy, MIT, Georgetown Law<br />Maritime
 							investigations, naval operations, non-profit founder</p>
 					</div>
 
 					<div class="tile">
-						<!-- <div class="avatar" data-img="assets/cto.jpeg" data-alt="Ari Brown headshot">
-							<div class="avatar-frame">
-								<img class="avatar-img" alt="" loading="lazy" />
-								<div class="avatar-placeholder">
-									CTO photo (optional)<br />
-									<span class="hint"
-										style="display:block;margin-top:6px;color:rgba(23,26,32,.52)">assets/ari-brown.jpg</span>
-								</div>
-							</div>
-						</div> -->
-
 						<img src="assets/cto.jpeg" alt="Founding team member" class="img-circle" />
-
 						<h3>CTO</h3>
 						<p><strong>Ari Brown</strong><br />U Michigan<br />Sensor fusion, autonomy, submarine veteran,
 							naval engineering</p>
 					</div>
 
 					<div class="tile">
-						<!-- <div class="avatar" data-img="assets/coo.png" data-alt="Jesse Neumann headshot">
-							<div class="avatar-frame">
-								<img class="avatar-img" alt="" loading="lazy" />
-								<div class="avatar-placeholder">
-									COO photo (optional)<br />
-									<span class="hint"
-										style="display:block;margin-top:6px;color:rgba(23,26,32,.52)">assets/jesse-neumann.jpg</span>
-								</div>
-							</div>
-						</div> -->
-
 						<img src="assets/coo.png" alt="Founding team member" class="img-circle" />
-
 						<h3>COO</h3>
 						<p><strong>Jesse Neumann</strong><br />Mass College of Art, Suffolk Law<br />Bridge systems,
 							vessel networks, naval surface warfare operations</p>
@@ -883,17 +792,6 @@
 			<div class="content wrap">
 				<div class="sectionTitle">Request a Demo</div>
 				<div class="subtitle"></div>
-
-				<!-- <div class="media" data-img="assets/demo.jpg" data-alt="Contact slide image">
-					<div class="media-frame">
-						<img class="media-img" alt="" loading="lazy" />
-						<div class="media-placeholder">
-							Contact slide image placeholder (optional)
-							<span class="hint">Add an image at <strong>assets/contact.jpg</strong> or edit
-								<code>data-img</code>.</span>
-						</div>
-					</div>
-				</div> -->
 
 				<img src="assets/demo.jpg" alt="Problem illustration" class="img-small" />
 
